@@ -346,7 +346,7 @@ If you want to use hardware IRQ but not having 3 IO pins, another trick is
 to OR DIO0/DOI1/DIO2 into one. This is possible because the stack check 
 all IRQs, even if only one is triggered. Doing this is quite easy, just add 3
 1N4148 diodes to each output and a pulldown resistor, see schematic example
-on [WeMos Lora shield](https://github.com/hallard/WeMos-Lora).
+on [WeMos Lora shield](https://github.com/hallard/WeMos-Lora#schematic).
 
 If you still have DIO connection, following original lib readme is explaining
 how they work.
