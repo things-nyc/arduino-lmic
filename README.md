@@ -370,7 +370,7 @@ If you used 3 diodes OR hardware trick like in this [schematic](https://github.c
 just indicate which GPIO is used on DIO0 definition as follow:
 
 ```arduino
-// Example with 3 DIO OR'ed on one pin connected to GPIO14
+// Example with 3 DIO OR'ed on one pin connected to GPIO15
 const lmic_pinmap lmic_pins = {
     .nss = 16,
     .rxtx = LMIC_UNUSED_PIN,
