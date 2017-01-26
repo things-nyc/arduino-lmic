@@ -788,6 +788,27 @@ static CONST_TABLE(u2_t, LORA_RXDONE_FIXUP)[] = {
     [SF12] = us2osticks(31189), // (1022 ticks)
 };
 
+
+// called by hal to check if we got one IRQ
+// This trick directly read the Lora module IRQ register
+// and thus avoid any IRQ line used to controler
+u1_t radio_has_irq (void) {
+    u1_t flags ;
+    if( (readReg(RegOpMode) & OPMODE_LORA) != 0) { // LORA modem
+        flags = readReg(LORARegIrqFlags);
+        if( flags & ( IRQ_LORA_TXDONE_MASK | IRQ_LORA_RXDONE_MASK | IRQ_LORA_RXTOUT_MASK ) ) 
+            return 1;
+    } else { // FSK modem
+        flags = readReg(FSKRegIrqFlags2);
+        if ( flags & ( IRQ_FSK2_PACKETSENT_MASK | IRQ_FSK2_PAYLOADREADY_MASK) ) 
+            return 1;
+        flags = readReg(FSKRegIrqFlags1);
+        if ( flags & IRQ_FSK1_TIMEOUT_MASK ) 
+            return 1;
+    }
+    return 0;
+}
+
 // called by hal ext IRQ handler
 // (radio goes to stanby mode after tx/rx operations)
 void radio_irq_handler (u1_t dio) {
