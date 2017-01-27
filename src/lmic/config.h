@@ -60,6 +60,10 @@
 // current implementation only works on AVR, though.
 //#define LMIC_PRINTF_TO Serial
 
+#if LMIC_DEBUG_LEVEL > 0 && ! defined(LMIC_PRINTF_TO)
+# error "You defined LMIC_DEBUG_LEVEL, please also define LMIC_PRINTF_TO to see debug log"
+#endif
+
 // Enable this to use interrupt handler routines listening for RISING signals.
 // Otherwise, the library polls digital input lines for changes.
 //#define LMIC_USE_INTERRUPTS
