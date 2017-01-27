@@ -13,6 +13,7 @@
 #include "../lmic.h"
 #include "hal.h"
 #include <stdio.h>
+#include <stdarg.h>
 
 // -----------------------------------------------------------------------------
 // I/O
@@ -272,24 +273,16 @@ void hal_sleep () {
 // -----------------------------------------------------------------------------
 
 #if defined(LMIC_PRINTF_TO)
-static int uart_putchar (char c, FILE *)
+void hal_printf(char *fmt, ... )
 {
-    LMIC_PRINTF_TO.write(c) ;
-    return 0 ;
+    char buf[80]; // resulting string limited to 128 chars
+    va_list args;
+    va_start (args, fmt );
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end (args);
+    LMIC_PRINTF_TO.print(buf);
 }
-
-void hal_printf_init() {
-    // create a FILE structure to reference our UART output function
-    static FILE uartout;
-    memset(&uartout, 0, sizeof(uartout));
-
-    // fill in the UART file descriptor with pointer to writer.
-    fdev_setup_stream (&uartout, uart_putchar, NULL, _FDEV_SETUP_WRITE);
-
-    // The uart is the standard output device STDOUT.
-    stdout = &uartout ;
-}
-#endif // defined(LMIC_PRINTF_TO)
+#endif
 
 void hal_init () {
     // configure radio I/O and interrupt handler
@@ -298,10 +291,6 @@ void hal_init () {
     hal_spi_init();
     // configure timer and interrupt handler
     hal_time_init();
-#if defined(LMIC_PRINTF_TO)
-    // printf support
-    hal_printf_init();
-#endif
 }
 
 void hal_failed (const char *file, u2_t line) {
