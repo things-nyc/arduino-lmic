@@ -402,7 +402,7 @@ This board uses the following pin mapping:
      .nss = 17,
      .rxtx = LMIC_UNUSED_PIN,
      .rst = 18,
-     .dio = {23, 23, 23}, //workaround to use 1 pin for all 3 radio dio pins
+     .dio = {23, LMIC_UNUSED_PIN, LMIC_UNUSED_PIN}, 
  };
  ```
  You will also need Arduino ESP32 support from
@@ -411,6 +411,26 @@ This board uses the following pin mapping:
  pin P3 (G23) to ground, push the reset button to put the LoPy in bootloader
  mode. After programming reset the board without P3 shorted to ground to start
  in normal mode.
+
+ ### Heltec Lora32 (ESP32)
+ When using Heltec Lora32 you will need the following pin mapping:
+ 
+ ```
+ const lmic_pinmap lmic_pins = {
+     .mosi = 27,
+     .miso = 19,
+     .sck = 5,
+     .nss = 18,
+     .rxtx = LMIC_UNUSED_PIN,
+     .rst = 14,
+     .dio = {26, 33, 32}, 
+ };
+
+ ```
+ On Board OLED is I2C with SCL=GPIO15, SDA=GPIO4 and OLED_RST=GPIO16.
+ You will also need Arduino ESP32 support from
+ https://github.com/espressif/arduino-esp32. Use the "ESP32 Dev Module" as target
+ device.
 
 
 Examples
