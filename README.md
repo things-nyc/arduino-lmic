@@ -242,6 +242,7 @@ library what pin you used through the pin mapping (see below).
 [SPI]: https://www.arduino.cc/en/Reference/SPI
 
 ### DIO pins
+
 The DIO (digitial I/O) pins on the transceiver board can be configured
 for various functions. The LMIC library uses them to get instant status
 information from the transceiver. For example, when a LoRa transmission
@@ -254,6 +255,11 @@ DIOx pins can be left disconnected. On the Arduino side, they can
 connect to any I/O pin, since the current implementation does not use
 interrupts or other special hardware features (though this might be
 added in the feature, see also the "Timing" section).
+
+A new software feature has been added to remove needing DIO connections. 
+Of course, you can continue to use DIO mapping has described above 
+but in case you're restricted in GPIO available, but for now you can use
+LMIC using no DIO to any GPIO connection (see below).
 
 In LoRa mode the DIO pins are used as follows:
  * DIO0: TxDone and RxDone
@@ -324,22 +330,108 @@ The names refer to the pins on the transceiver side, the numbers refer
 to the Arduino pin numbers (to use the analog pins, use constants like
 `A0`). For the DIO pins, the three numbers refer to DIO0, DIO1 and DIO2
 respectively. Any pins that are not needed should be specified as
-`LMIC_UNUSED_PIN`. The nss and dio0 pin is required, the others can
+`LMIC_UNUSED_PIN`. Only the nss pin is required, the others can
 potentially left out (depending on the environments and requirements,
 see the notes above for when a pin can or cannot be left out).
 
 The name of this struct must always be `lmic_pins`, which is a special name
 recognized by the library.
 
+Since now, a software feature has been added to remove needing DIO connections. 
+Of course, you can continue to use DIO mapping has follow. to activate this 
+feature, you just need to declare 3 .dio to LMIC_UNUSED_PIN, in your sketch as 
+detailled below. 
+
+If you want to use hardware IRQ but not having 3 IO pins, another trick is
+to OR DIO0/DOI1/DIO2 into one. This is possible because the stack check 
+all IRQs, even if only one is triggered. Doing this is quite easy, just add 3
+1N4148 diodes to each output and a pulldown resistor, see schematic example
+on [WeMos Lora shield](https://github.com/hallard/WeMos-Lora#schematic).
+
+If you still have DIO connection, following original lib readme is explaining
+how they work.
+
+If you don't have any DIO pins connected to GPIO (new software feature)
+you just need to declare 3 .dio to LMIC_UNUSED_PIN, in your sketch 
+That's all, stack will do the job for you.
+
+#### [WeMos Lora Shield](https://github.com/hallard/WeMos-Lora)
+```arduino
+// Example with NO DIO pin connected
+const lmic_pinmap lmic_pins = {
+    .nss = 16,
+    .rxtx = LMIC_UNUSED_PIN,
+    .rst = LMIC_UNUSED_PIN,
+    .dio = {LMIC_UNUSED_PIN, LMIC_UNUSED_PIN, LMIC_UNUSED_PIN},
+};
+```
+
+If you used 3 diodes OR hardware trick like in this [schematic](https://github.com/hallard/WeMos-Lora),
+just indicate which GPIO is used on DIO0 definition as follow:
+
+```arduino
+// Example with 3 DIO OR'ed on one pin connected to GPIO15
+const lmic_pinmap lmic_pins = {
+    .nss = 16,
+    .rxtx = LMIC_UNUSED_PIN,
+    .rst = LMIC_UNUSED_PIN,
+    .dio = {15, LMIC_UNUSED_PIN, LMIC_UNUSED_PIN},
+};
+```
+
 #### LoRa Nexus by Ideetron
 This board uses the following pin mapping:
 
+```arduino
     const lmic_pinmap lmic_pins = {
         .nss = 10,
         .rxtx = LMIC_UNUSED_PIN,
         .rst = LMIC_UNUSED_PIN, // hardwired to AtMega RESET
         .dio = {4, 5, 7},
     };
+```
+
+### LoPy (ESP32)
+ When using the LoPy you will need the following pin mapping:
+ 
+ ```
+ const lmic_pinmap lmic_pins = {
+     .mosi = 27,
+     .miso = 19,
+     .sck = 5,
+     .nss = 17,
+     .rxtx = LMIC_UNUSED_PIN,
+     .rst = 18,
+     .dio = {23, LMIC_UNUSED_PIN, LMIC_UNUSED_PIN}, 
+ };
+ ```
+ You will also need Arduino ESP32 support from
+ https://github.com/espressif/arduino-esp32. Use the "ESP32 Dev Module" as target
+ device. To program the LoPy you need to be in bootloader mode. While shorting
+ pin P3 (G23) to ground, push the reset button to put the LoPy in bootloader
+ mode. After programming reset the board without P3 shorted to ground to start
+ in normal mode.
+
+ ### Heltec Lora32 (ESP32)
+ When using Heltec Lora32 you will need the following pin mapping:
+ 
+ ```
+ const lmic_pinmap lmic_pins = {
+     .mosi = 27,
+     .miso = 19,
+     .sck = 5,
+     .nss = 18,
+     .rxtx = LMIC_UNUSED_PIN,
+     .rst = 14,
+     .dio = {26, 33, 32}, 
+ };
+
+ ```
+ On Board OLED is I2C with SCL=GPIO15, SDA=GPIO4 and OLED_RST=GPIO16.
+ You will also need Arduino ESP32 support from
+ https://github.com/espressif/arduino-esp32. Use the "ESP32 Dev Module" as target
+ device.
+
 
 Examples
 --------

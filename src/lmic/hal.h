@@ -100,6 +100,20 @@ u1_t hal_checkTimer (u4_t targettime);
  */
 void hal_failed (const char *file, u2_t line);
 
+// printf Wrapper
+#ifdef LMIC_PRINTF_TO
+
+/*
+ * perform printf like action.
+ *   - called when LMIC_PRINTF_TO used
+ *   - action printf
+ */
+void hal_printf(char *fmt, ... );
+
+#define printf hal_printf
+
+#endif
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
