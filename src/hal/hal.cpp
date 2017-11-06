@@ -142,8 +142,21 @@ static void hal_io_check() {
 static const SPISettings settings(LMIC_SPI_FREQ, MSBFIRST, SPI_MODE0);
 
 static void hal_spi_init () {
-    SPI.begin();
+    #if defined(ESP32)
+      // On the ESP32 the default is _use_hw_ss(false), 
+      // so we can set the last parameter to anything.
+      SPI.begin(lmic_pins.sck, lmic_pins.miso, lmic_pins.mosi, 0x00);
+    #elif defined(NRF51)
+      SPI.begin(lmic_pins.sck, lmic_pins.mosi, lmic_pins.miso);
+    #else
+      //unknown board, or board without SPI pin select ability
+      SPI.begin(); 
+    #endif
 }
+
+
+
+
 
 void hal_pin_nss (u1_t val) {
     if (!val)

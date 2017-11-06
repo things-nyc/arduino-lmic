@@ -382,12 +382,36 @@ const lmic_pinmap lmic_pins = {
 #### LoRa Nexus by Ideetron
 This board uses the following pin mapping:
 
+```arduino
     const lmic_pinmap lmic_pins = {
         .nss = 10,
         .rxtx = LMIC_UNUSED_PIN,
         .rst = LMIC_UNUSED_PIN, // hardwired to AtMega RESET
         .dio = {4, 5, 7},
     };
+```
+
+### LoPy (ESP32)
+ When using the LoPy you will need the following pin mapping:
+ 
+ ```
+ const lmic_pinmap lmic_pins = {
+     .mosi = 27,
+     .miso = 19,
+     .sck = 5,
+     .nss = 17,
+     .rxtx = LMIC_UNUSED_PIN,
+     .rst = 18,
+     .dio = {23, 23, 23}, //workaround to use 1 pin for all 3 radio dio pins
+ };
+ ```
+ You will also need Arduino ESP32 support from
+ https://github.com/espressif/arduino-esp32. Use the "ESP32 Dev Module" as target
+ device. To program the LoPy you need to be in bootloader mode. While shorting
+ pin P3 (G23) to ground, push the reset button to put the LoPy in bootloader
+ mode. After programming reset the board without P3 shorted to ground to start
+ in normal mode.
+
 
 Examples
 --------
